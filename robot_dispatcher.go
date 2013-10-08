@@ -2,7 +2,10 @@ package main
 
 import "fmt"
 //import "time"
-//import "encoding/csv"
+import "os"
+import "io"
+import "encoding/csv"
+import "strconv"
 
 type Point struct {
 
@@ -11,8 +14,7 @@ type Point struct {
   time string
 }
 
-func NewPoint(x float32, y float32, time string) *Point {
-    p := Point{x, y, time}
+func NewPoint(x float32, y float32, time string) *Point { p := Point{x, y, time}
     return &p
 }
 
@@ -30,6 +32,30 @@ type Dispatcher struct {
 func (self *Dispatcher) GetPoints (botId string) {
   fmt.Printf("bot  id is %s", botId)
 }
+
+func (self *Dispatcher) LoadPoints (botId int) {
+  filename := strconv.Itoa(botId) + ".csv"
+  file, err := os.Open(filename)
+  if err != nil {
+    fmt.Println("Error:", err)
+    return
+  }
+  defer file.Close()
+  reader := csv.NewReader(file)
+  for {
+    record, err := reader.Read()
+    if err == io.EOF {
+      break
+    } else if err != nil {
+      fmt.Println("Error:", err)
+      return
+    }
+    fmt.Println(record) // record has the type []string
+  }
+  fmt.Printf("the id is %s", filename)
+
+}
+
 
 func main() {
   botIds := [2]int{5937, 6043}

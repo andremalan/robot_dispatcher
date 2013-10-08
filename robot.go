@@ -7,3 +7,6 @@ type Robot struct {
 }
 
 
+func (self *Robot) visitPoint (point Point){
+
+}
