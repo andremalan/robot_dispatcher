@@ -9,12 +9,12 @@ import "strconv"
 
 type Point struct {
 
-  x float32
-  y float32
+  x float64
+  y float64
   time string
 }
 
-func NewPoint(x float32, y float32, time string) *Point { p := Point{x, y, time}
+func NewPoint(x float64, y float64, time string) *Point { p := Point{x, y, time}
     return &p
 }
 
@@ -42,6 +42,7 @@ func (self *Dispatcher) LoadPoints (botId int) {
   }
   defer file.Close()
   reader := csv.NewReader(file)
+  var index int
   for {
     record, err := reader.Read()
     if err == io.EOF {
@@ -50,10 +51,11 @@ func (self *Dispatcher) LoadPoints (botId int) {
       fmt.Println("Error:", err)
       return
     }
+    p, _ := strconv.ParseFloat(record[1], 64)
+    self.bots[0].points[index].x = p
+    index++
     fmt.Println(record) // record has the type []string
   }
-  fmt.Printf("the id is %s", filename)
-
 }
 
 
