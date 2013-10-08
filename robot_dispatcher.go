@@ -51,10 +51,14 @@ func (self *Dispatcher) LoadPoints (botId int) {
       fmt.Println("Error:", err)
       return
     }
-    p, _ := strconv.ParseFloat(record[1], 64)
-    self.bots[0].points[index].x = p
+    x, _ := strconv.ParseFloat(record[1], 64)
+    y, _ := strconv.ParseFloat(record[2], 64)
+    t := record[3]
+
+    self.bots[0].points[index].x = x
+    self.bots[0].points[index].y = y
+    self.bots[0].points[index].time = t
     index++
-    fmt.Println(record) // record has the type []string
   }
 }
 
