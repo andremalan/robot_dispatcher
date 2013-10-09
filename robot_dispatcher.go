@@ -26,7 +26,7 @@ type Bot struct{
 }
 
 type Dispatcher struct {
-  bots [2]Bot
+  bots map[string]Bot
 }
 
 func (self *Dispatcher) GetPoints (botId string) {
@@ -34,7 +34,8 @@ func (self *Dispatcher) GetPoints (botId string) {
 }
 
 func (self *Dispatcher) LoadPoints (botId int) {
-  filename := strconv.Itoa(botId) + ".csv"
+  stringId := strconv.Itoa(botId)
+  filename :=  stringId + ".csv"
   file, err := os.Open(filename)
   if err != nil {
     fmt.Println("Error:", err)
@@ -42,6 +43,7 @@ func (self *Dispatcher) LoadPoints (botId int) {
   }
   defer file.Close()
   reader := csv.NewReader(file)
+  bot := self.bots[stringId]
   var index int
   for {
     record, err := reader.Read()
@@ -54,29 +56,20 @@ func (self *Dispatcher) LoadPoints (botId int) {
     x, _ := strconv.ParseFloat(record[1], 64)
     y, _ := strconv.ParseFloat(record[2], 64)
     t := record[3]
-
-    self.bots[0].points[index].x = x
-    self.bots[0].points[index].y = y
-    self.bots[0].points[index].time = t
+    bot.points[index] =  Point{x,y,t}
     index++
   }
+  self.bots[stringId] = bot
 }
 
 
 func main() {
-  botIds := [2]int{5937, 6043}
-  dispatcher := new(Dispatcher)
-  dispatcher.bots[0] = *new(Bot)
-  dispatcher.bots[1] = *new(Bot)
-  dispatcher.bots[0].robot.id = botIds[0]
-  dispatcher.bots[1].robot.id = botIds[1]
-  dispatcher.bots[0].points[0] = *NewPoint(3.0,4.0, "Yesterday")
+  //botIds := [2]int{5937, 6043}
+  bots := map[string]Bot{"5937" : *new(Bot), "6043" : *new(Bot)}
+  dispatcher := Dispatcher{bots}
+  dispatcher.LoadPoints(5937)
+  dispatcher.LoadPoints(6043)
+  fmt.Printf("dispatcher is: %v", dispatcher)
 
-  robot := dispatcher.bots[0].robot
-  fmt.Printf("bot name is %s and id is %d", robot.name, robot.id)
-  fmt.Printf("Dispatcher outputs:" )
-  dispatcher.GetPoints("MYID")
-  point := dispatcher.bots[0].points[0]
-  fmt.Printf("the first point is: %f %f %s", point.x, point.y, point.time)
 }
 
